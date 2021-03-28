@@ -75,6 +75,7 @@ pipeline {
                     sh "mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$releaseVersion"
                     sh "mvn -e clean compile scm:checkin scm:tag -Dmessage=\"SCM - version $releaseVersion\" -Dtag=$releaseVersion"
                     sh "mvn versions:set scm:checkin -DgenerateBackupPoms=false -DnewVersion=$newSnapshotVersion -Dmessage=\"SCM - new dev version $newSnapshotVersion\""
+                }
             }
         }
     }
