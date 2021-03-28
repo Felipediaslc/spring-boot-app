@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         RELEASE_BRANCH = "master"
-        CREDENTIAL_ID="1d1e8146-73e0-4936-abc4-e6b92e7a18c7"
+        CREDENTIAL_ID = "1d1e8146-73e0-4936-abc4-e6b92e7a18c7"
     }
 
     stages {
@@ -17,6 +17,14 @@ pipeline {
                     echo "PATH = ${PATH}"
                     echo "M2_HOME = ${M2_HOME}"
                     '''
+                script {
+                    def jenkinsProperties = [buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '2'))]
+                    if (env.BRANCH_NAME == 'develop') {
+                        echo 'Using development configuration'
+                        jenkinsProperties.add(pipelineTriggers([[$class: "SCMTrigger", scmpoll_spec: "H/5 * * * *"], ]))
+                    }
+                    properties(jenkinsProperties)
+                }
             }
         }
 
@@ -75,6 +83,28 @@ pipeline {
                     sh "mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$releaseVersion"
                     sh "mvn -e clean compile scm:checkin scm:tag -Dmessage=\"SCM - version $releaseVersion\" -Dtag=$releaseVersion"
                     sh "mvn versions:set scm:checkin -DgenerateBackupPoms=false -DnewVersion=$newSnapshotVersion -Dmessage=\"SCM - new dev version $newSnapshotVersion\""
+                }
+            }
+        }
+
+        stage('Empacar') {
+            when {
+                branch RELEASE_BRANCH
+            }
+            steps {
+                sh "$JENKINS_HOME/empacar.py -u $EMPACAR_USER -p $EMPACAR_PASS -r lenny -t $releaseVersion"
+            }
+        }
+
+        stage('Deploy to BETA') {
+            when {
+                branch RELEASE_BRANCH
+            }
+            steps {
+                script {
+                    ARTIFACT_VERSION = "com.despegar.loyalty:ppt:$releaseVersion"
+                    echo "Deploying artifact version: $ARTIFACT_VERSION"
+                    sh "$JENKINS_HOME/deploy.py -l prod -n nexusprod -a $ARTIFACT_VERSION -c $CLUSTER_BETA -u $CLOUDIA_CLIENT_ID -p $CLOUDIA_CLIENT_SECRET"
                 }
             }
         }
