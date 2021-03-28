@@ -13,11 +13,12 @@ pipeline {
                     echo "M2_HOME = ${M2_HOME}"
                     '''
             }
-    }
+        }
 
-    stage ('Build') {
-        steps {
-            echo 'This is a minimal pipeline.'
+        stage ('Build') {
+            steps {
+                echo 'This is a minimal pipeline.'
+            }
         }
     }
 }
