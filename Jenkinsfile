@@ -8,6 +8,7 @@ pipeline {
     environment {
         RELEASE_BRANCH = "master"
         CREDENTIAL_ID = "1d1e8146-73e0-4936-abc4-e6b92e7a18c7"
+        CLUSTER_BETA = "ppt-beta"
     }
 
     stages {
