@@ -49,7 +49,7 @@ pipeline {
                     newSnapshotVersion = versionConstituents.join('.') + "-SNAPSHOT"
                 }
 
-                try {
+                script {
                     timeout(time: 5, unit: 'MINUTES') {
                         script {
                             userInput = input(
@@ -59,14 +59,14 @@ pipeline {
                             ])
                         }
                     }
-                    script {
-                        releaseVersion = userInput['RELEASE_VERSION']
-                        newSnapshotVersion = userInput['NEW_SNAPSHOT_VERSION']
-                        //Change current build name
-                        currentBuild.description = "Release $releaseVersion"
-                        echo "Release Version: $releaseVersion"
-                        echo "New snapshot version: $newSnapshotVersion"
-                    }
+
+                    releaseVersion = userInput['RELEASE_VERSION']
+                    newSnapshotVersion = userInput['NEW_SNAPSHOT_VERSION']
+                     //Change current build name
+                     currentBuild.description = "Release $releaseVersion"
+                     echo "Release Version: $releaseVersion"
+                     echo "New snapshot version: $newSnapshotVersion"
+
                 } catch(err) { // timeout reached or input Aborted
                     def user = err.getCauses()[0].getUser()
                     if('SYSTEM' == user.toString()) { // SYSTEM means timeout
