@@ -50,6 +50,7 @@ pipeline {
                 }
 
                 script {
+                try {
                     timeout(time: 5, unit: 'MINUTES') {
                         script {
                             userInput = input(
