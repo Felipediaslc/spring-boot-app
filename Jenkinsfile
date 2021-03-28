@@ -59,9 +59,9 @@ pipeline {
             }
         }
 
-        stage ('Build') {
+        stage('Test') {
             steps {
-                sh "mvn -Dintegration-tests.skip=true clean package"
+                sh "mvn --batch-mode -V -U -e clean test -Dsurefire.useFile=false"
             }
         }
     }
