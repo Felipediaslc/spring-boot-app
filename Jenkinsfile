@@ -49,22 +49,33 @@ pipeline {
                     newSnapshotVersion = versionConstituents.join('.') + "-SNAPSHOT"
                 }
 
-                timeout(time: 5, unit: 'MINUTES') {
-                    script {
-                        userInput = input(
-                            id: 'userInput', message: 'VERSION', parameters: [
-                            [$class: 'TextParameterDefinition', defaultValue: releaseVersion, description: 'Version to release', name: 'RELEASE_VERSION'],
-                            [$class: 'TextParameterDefinition', defaultValue: newSnapshotVersion, description: 'Version to keep on repository to continue development', name: 'NEW_SNAPSHOT_VERSION']
-                        ])
+                try {
+                    timeout(time: 5, unit: 'MINUTES') {
+                        script {
+                            userInput = input(
+                                id: 'userInput', message: 'VERSION', parameters: [
+                                [$class: 'TextParameterDefinition', defaultValue: releaseVersion, description: 'Version to release', name: 'RELEASE_VERSION'],
+                                [$class: 'TextParameterDefinition', defaultValue: newSnapshotVersion, description: 'Version to keep on repository to continue development', name: 'NEW_SNAPSHOT_VERSION']
+                            ])
+                        }
                     }
-                }
-                script {
-                    releaseVersion = userInput['RELEASE_VERSION']
-                    newSnapshotVersion = userInput['NEW_SNAPSHOT_VERSION']
-                    //Change current build name
-                    currentBuild.description = "Release $releaseVersion"
-                    echo "Release Version: $releaseVersion"
-                    echo "New snapshot version: $newSnapshotVersion"
+                    script {
+                        releaseVersion = userInput['RELEASE_VERSION']
+                        newSnapshotVersion = userInput['NEW_SNAPSHOT_VERSION']
+                        //Change current build name
+                        currentBuild.description = "Release $releaseVersion"
+                        echo "Release Version: $releaseVersion"
+                        echo "New snapshot version: $newSnapshotVersion"
+                    }
+                } catch(err) { // timeout reached or input Aborted
+                    def user = err.getCauses()[0].getUser()
+                    if('SYSTEM' == user.toString()) { // SYSTEM means timeout
+                        echo ("Input timeout expired, default version will be used: " + releaseVersion)
+                        currentBuild.description = "Release $releaseVersion"
+                    } else {
+                        echo "Input aborted by: [${user}]"
+                        error("Pipeline aborted by: [${user}]")
+                    }
                 }
             }
         }
