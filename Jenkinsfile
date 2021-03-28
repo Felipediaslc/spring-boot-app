@@ -17,9 +17,6 @@ pipeline {
 
         stage ('Build') {
             steps {
-                def targetVersion = getDevVersion()
-                print 'target build version...'
-                print targetVersion
                 sh "mvn -Dintegration-tests.skip=true clean package"
             }
         }
