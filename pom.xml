@@ -13,6 +13,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>webapp</name>
 	<description>Demo project for Spring Boot</description>
+
+	<scm>
+		<url>https://github.com/gerulrich/spring-boot-app</url>
+		<connection>scm:git:git@github.com:gerulrich/spring-boot-app.git</connection>
+		<developerConnection>scm:git:git@github.com:gerulrich/spring-boot-app.git</developerConnection>
+	</scm>
+
 	<properties>
 		<java.version>11</java.version>
 	</properties>
