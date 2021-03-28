@@ -49,17 +49,17 @@ pipeline {
                     newSnapshotVersion = versionConstituents.join('.') + "-SNAPSHOT"
                 }
 
-                script {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        script {
-                            userInput = input(
-                                id: 'userInput', message: 'VERSION', parameters: [
-                                [$class: 'TextParameterDefinition', defaultValue: releaseVersion, description: 'Version to release', name: 'RELEASE_VERSION'],
-                                [$class: 'TextParameterDefinition', defaultValue: newSnapshotVersion, description: 'Version to keep on repository to continue development', name: 'NEW_SNAPSHOT_VERSION']
-                            ])
-                        }
+
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        userInput = input(
+                            id: 'userInput', message: 'VERSION', parameters: [
+                            [$class: 'TextParameterDefinition', defaultValue: releaseVersion, description: 'Version to release', name: 'RELEASE_VERSION'],
+                            [$class: 'TextParameterDefinition', defaultValue: newSnapshotVersion, description: 'Version to keep on repository to continue development', name: 'NEW_SNAPSHOT_VERSION']
+                        ])
                     }
                 }
+
 
                 script {
                     releaseVersion = userInput['RELEASE_VERSION']
