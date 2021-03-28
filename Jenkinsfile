@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         RELEASE_BRANCH = "master"
+        CREDENTIAL_ID="1d1e8146-73e0-4936-abc4-e6b92e7a18c7"
     }
 
     stages {
@@ -62,6 +63,18 @@ pipeline {
         stage('Test') {
             steps {
                 sh "mvn --batch-mode -V -U -e clean test -Dsurefire.useFile=false"
+            }
+        }
+
+        stage('Bump release versions') {
+            when {
+                branch RELEASE_BRANCH
+            }
+            steps {
+                sshagent(credentials:[CREDENTIAL_ID]) {
+                    sh "mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$releaseVersion"
+                    sh "mvn -e clean compile scm:checkin scm:tag -Dmessage=\"SCM - version $releaseVersion\" -Dtag=$releaseVersion"
+                    sh "mvn versions:set scm:checkin -DgenerateBackupPoms=false -DnewVersion=$newSnapshotVersion -Dmessage=\"SCM - new dev version $newSnapshotVersion\""
             }
         }
     }
